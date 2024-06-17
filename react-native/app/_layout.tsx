@@ -4,12 +4,12 @@ import {useEffect} from "react";
 import {SafeAreaView, View} from "react-native";
 import "react-native-reanimated";
 import Home from "./(routes)/home";
-// import {ReactNativeExtension} from "@dynamic-labs/react-native-extension";
-// import {createClient} from "@dynamic-labs/client";
+import {ReactNativeExtension} from "@dynamic-labs/react-native-extension";
+import {createClient} from "@dynamic-labs/client";
 
-// export const client = createClient({
-//   environmentId: process.env.ENVIRONMENT_ID!,
-// }).extend(ReactNativeExtension());
+export const client = createClient({
+  environmentId: process.env.ENVIRONMENT_ID!,
+}).extend(ReactNativeExtension());
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

@@ -1,6 +1,10 @@
 const express = require("express");
 const axios = require("axios");
 const cron = require("node-cron");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const { Novu } = require("@novu/node");
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -8,6 +12,7 @@ const port = process.env.PORT || 8000;
 // Define your routes here
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Welcome to ChainNotify!");
@@ -25,6 +30,8 @@ app.post("/getEventNames", (req, res) => {
 
 // Store cron jobs in an object
 const cronJobs = {};
+// In-memory store for previously seen events
+const userEventStore = {};
 
 // Helper function to generate a unique key for each job
 const generateCronJobKey = (userAddress, contractAddress, eventName) => {
@@ -35,33 +42,169 @@ const generateCronJobKey = (userAddress, contractAddress, eventName) => {
 app.post("/setEvent", (req, res) => {
   const { userAddress, contractAddress, eventName } = req.body;
 
-  const fetchUrl = "url";
-
-  if (!userAddress || !contractAddress || !eventName || !fetchUrl) {
+  if (!userAddress || !contractAddress || !eventName) {
     return res.status(400).send("Missing required parameters.");
   }
 
   const jobKey = generateCronJobKey(userAddress, contractAddress, eventName);
 
   // Create and store the cron job
-  const job = cron.schedule("*/5 * * * *", async () => {
+  const job = cron.schedule("*/1 * * * *", async () => {
     try {
-      const response = await axios.get(fetchUrl);
-      const latestEvents = response.data;
+      const { userAddress, eventName, contractAddress } = req.body;
+      console.log(
+        `Fetching events for ${eventName} on contract ${contractAddress} for user ${userAddress}`
+      );
 
-      // Your logic to handle new events goes here
-      console.log(`Fetched latest events for ${jobKey}:`, latestEvents);
+      const url = `https://api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
+      const options = {
+        headers: {
+          accept: "application/json",
+          "x-api-key": process.env.NEXT_VOYAGER_API_KEY,
+        },
+      };
+
+      const jobKey = `${userAddress}-${contractAddress}-${eventName}`;
+      console.log(jobKey, "Created job key");
+
+      const response = await axios.get(url, options);
+      const latestEvents = response.data.items;
+
+      // Initialize user event store if not present
+      if (!userEventStore[userAddress]) {
+        userEventStore[userAddress] = new Set();
+      }
+
+      const storedEventIds = userEventStore[userAddress];
+
+      // Filter out new events
+      const newEvents = latestEvents.filter((event) => {
+        return event.name === eventName && !storedEventIds.has(event.eventId);
+      });
+
+      // Store new event IDs
+      newEvents.forEach((event) => {
+        storedEventIds.add(event.eventId);
+      });
+
+      // Trigger notifications for new events (implementation depends on your notification system)
+      newEvents.forEach((event) => {
+        console.log(`New event for ${userAddress}:`, event.eventId);
+        // triggerNotification(userAddress, event); // Uncomment and implement this function as needed
+      });
     } catch (error) {
-      console.error(`Error fetching events for ${jobKey}:`, error);
+      console.error(error.message);
+      res.status(500).json({ error: error.message });
     }
   });
 
-  // Store the job using the unique key
   cronJobs[jobKey] = job;
 
-  res.send(
-    `Cron job has been set to fetch events every 5 minutes for ${jobKey}.`
-  );
+  res.json(jobKey).status(200);
+});
+
+const novu = new Novu(process.env.NEXT_PUBLIC_NOVU_API_KEY);
+
+const triggerNotification = async (
+  subscriberId,
+  email,
+  userAddress,
+  eventName,
+  eventTitle,
+  contractAddress
+) => {
+  console.log(novu);
+
+  try {
+    const res = await novu.trigger("chainnotify", {
+      to: {
+        subscriberId: subscriberId,
+        email: email,
+      },
+      payload: {
+        eventName: eventName,
+        eventTitle: eventTitle,
+        userAddresss: userAddress,
+        contractAddress: contractAddress,
+      },
+    });
+
+    console.log(res);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+app.post("/testNotification", async (req, res) => {
+  const subscriberId = "dasdas";
+  const email = "fidal15perfect@gmail.com";
+  const { userAddress, eventTitle, eventName, contractAddress } = req.body;
+
+  try {
+    triggerNotification(
+      subscriberId,
+      email,
+      userAddress,
+      eventName,
+      eventTitle,
+      contractAddress
+    );
+    res.status(200).json({ message: "Notification sent" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/test", async (req, res) => {
+  try {
+    const { userAddress, eventName, contractAddress } = req.body;
+    console.log(
+      `Fetching events for ${eventName} on contract ${contractAddress} for user ${userAddress}`
+    );
+
+    const url = `https://api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
+    const options = {
+      headers: {
+        accept: "application/json",
+        "x-api-key": process.env.NEXT_VOYAGER_API_KEY,
+      },
+    };
+
+    const jobKey = `${userAddress}-${contractAddress}-${eventName}`;
+    console.log(jobKey, "Created job key");
+
+    const response = await axios.get(url, options);
+    const latestEvents = response.data.items;
+
+    // Initialize user event store if not present
+    if (!userEventStore[userAddress]) {
+      userEventStore[userAddress] = new Set();
+    }
+
+    const storedEventIds = userEventStore[userAddress];
+
+    // Filter out new events
+    const newEvents = latestEvents.filter((event) => {
+      return event.name === eventName && !storedEventIds.has(event.eventId);
+    });
+
+    // Store new event IDs
+    newEvents.forEach((event) => {
+      storedEventIds.add(event.eventId);
+    });
+
+    // Trigger notifications for new events (implementation depends on your notification system)
+    newEvents.forEach((event) => {
+      console.log(`New event for ${userAddress}:`, event.eventId);
+      // triggerNotification(userAddress, event); // Uncomment and implement this function as needed
+    });
+
+    res.status(200).json(newEvents);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Endpoint to delete a cron job

@@ -60,8 +60,15 @@ const Home: NextPage = () => {
             <div className="flex flex-col gap-4 items-center">
               {!user && !connectedAddress.address ? (
                 <DynamicWidget />
+              ) : user && !connectedAddress.address ? (
+                <CustomConnectButton />
               ) : (
-                user && !connectedAddress.address && <CustomConnectButton />
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  Go to Dashboard
+                </button>
               )}
               <div className="text-sm flex justify-center items-center gap-2">
                 <p>Powered by</p>

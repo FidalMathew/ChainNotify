@@ -55,6 +55,14 @@ mod YourContract2 {
             self.EventNameMap.read(index)
         }
 
+        fn get_eventTitle(self: @ContractState, index: u64) -> ByteArray {
+            self.EventTitleMap.read(index)
+        }
+
+        fn get_chain(self: @ContractState, index: u64) -> ByteArray {
+            self.ChainMap.read(index)
+        }
+
 
         fn set_value(
             ref self: ContractState,
@@ -72,15 +80,6 @@ mod YourContract2 {
             self.count.write(updateValue + 1);
             self.EventTitleMap.write(updateValue, eventTitle);
             self.ChainMap.write(updateValue, chain);
-        }
-
-
-        fn get_eventTitle(self: @ContractState, index: u64) -> ByteArray {
-            self.EventTitleMap.read(index)
-        }
-
-        fn get_chain(self: @ContractState, index: u64) -> ByteArray {
-            self.ChainMap.read(index)
         }
     }
 }

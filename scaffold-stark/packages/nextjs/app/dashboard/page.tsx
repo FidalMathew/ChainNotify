@@ -43,19 +43,27 @@ const Dashboard: NextPage = () => {
     contractName: "YourContract2",
   });
 
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-      try {
-        // Retrieve the event title for the event with ID 1
-        // const data = await yourContract2?.functions.get_eventTitle(1);
-        // console.log("Event Title:", data);
-      } catch (error) {
-        console.error("Error fetching event title:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchEventDetails = async () => {
+  //     try {
+  //       // Retrieve the event title for the event with ID 1
 
-    fetchEventDetails();
-  }, [totalCounter, yourContract2]);
+  //       try {
+  //         const tokenId = await yourContract2?.functions["get_eventTitle"](
+  //           BigInt(1)
+  //         );
+
+  //         console.log("Event title:", tokenId);
+  //       } catch (e) {
+  //         console.error("Error fetching event title:", e);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching event title:", error);
+  //     }
+  //   };
+
+  //   fetchEventDetails();
+  // }, []);
 
   const {primaryWallet} = useDynamicContext();
 
@@ -210,7 +218,7 @@ const Dashboard: NextPage = () => {
               </button> */}
               <DynamicWidget />
 
-              <CustomConnectButton />
+              {/* <CustomConnectButton /> */}
             </div>
             <div
               className="p-3"

@@ -167,6 +167,8 @@ const deployedContracts = {
   },
   sepolia: {
     YourContract2: {
+      address:
+        "0x076185ac9c6a56923d211618b4417f0ac7019f1d149bd40b0738c8f6b6dbd575",
       abi: [
         {
           type: "impl",

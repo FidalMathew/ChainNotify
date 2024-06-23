@@ -205,6 +205,8 @@ const Dashboard: NextPage = () => {
 
           console.log(res, "res in get all values");
 
+          setIsChecked(res.data.active);
+
           if (
             displayOwner != "" &&
             displayContractAddresses != "" &&
@@ -428,7 +430,7 @@ const Dashboard: NextPage = () => {
                           <td>
                             <div className="flex items-center gap-2 border rounded-full w-fit p-1 px-2">
                               <img
-                                src="https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png"
+                                src="https://www.starknet-ecosystem.com/starknet-logo.png"
                                 alt="eth"
                                 className="h-5 w-5"
                               />
@@ -489,9 +491,9 @@ const Dashboard: NextPage = () => {
                                   }}
                                 />
 
-                                <span className="text-black">
+                                {/* <span className="text-black">
                                   {item.toggleState ? "Active" : "InActive"}
-                                </span>
+                                </span> */}
                               </label>
                             </div>
                           </td>

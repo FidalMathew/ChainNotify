@@ -60,7 +60,7 @@ export async function POST(req:
 
     const job = cron.schedule('* * * * *', async () => {
         try {
-            const url = `https://sepolia-api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
+            const url = `https://sepolia-api.voyager.online/beta/events?ps=1&p=1&contract=${contractAddress}`;
             const options = {
                 headers: {
                     accept: 'application/json',
@@ -89,7 +89,7 @@ export async function POST(req:
 
             newEvents.forEach(async (event: { eventId: any; }) => {
                 console.log(`New event for ${userAddress}:`, event.eventId);
-                // await triggerNotification(subscriberId, email, userAddress, eventName, eventTitle, contractAddress);
+                await triggerNotification(subscriberId, email, userAddress, eventName, eventTitle, contractAddress);
             });
         } catch (error) {
             console.error(error);

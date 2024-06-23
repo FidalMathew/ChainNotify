@@ -109,7 +109,7 @@ const Dashboard: NextPage = () => {
   //   }, [user, connectedAddress, router]);
 
   const {isFetching, data, refetch} = useContractRead({
-    address: contractsData.YourContract2.address,
+    address: contractsData.YourContract2?.address,
     functionName: "get_chain",
     abi: contractsData.YourContract2.abi as any[],
     args: ["1"],
@@ -203,6 +203,8 @@ const Dashboard: NextPage = () => {
             },
           });
 
+          console.log(res, "res in get all values");
+
           if (
             displayOwner != "" &&
             displayContractAddresses != "" &&
@@ -216,7 +218,7 @@ const Dashboard: NextPage = () => {
               eventName: displayEventName,
               eventTitle: displayEventTitle,
               chain: displayChain,
-              toggleState: true,
+              toggleState: res.data.active,
             });
           }
 
@@ -230,7 +232,7 @@ const Dashboard: NextPage = () => {
           setAllValues(values);
         }
       } catch (err) {
-        console.log(err, "err");
+        console.log(err, "err in setAllValues");
       }
     }
 
@@ -386,7 +388,7 @@ const Dashboard: NextPage = () => {
                   maxHeight: "calc(100vh - 130px)",
                 }}
               >
-                <table className="table">
+                <table className="table text-black">
                   {/* head */}
                   <thead className="text-black">
                     <tr>
@@ -486,6 +488,10 @@ const Dashboard: NextPage = () => {
                                     }
                                   }}
                                 />
+
+                                <span className="text-black">
+                                  {item.toggleState ? "Active" : "InActive"}
+                                </span>
                               </label>
                             </div>
                           </td>
@@ -494,7 +500,7 @@ const Dashboard: NextPage = () => {
                               className="btn btn-outline btn-xs text-black"
                               onClick={() =>
                                 router.push(
-                                  `/contractpage/${item.contractAddresses}`
+                                  `/eventPage?contractAddress=${item.contractAddress}&eventName=${item.eventName}`
                                 )
                               }
                             >
@@ -547,11 +553,11 @@ const Dashboard: NextPage = () => {
                             <th>
                               <button
                                 className="btn btn-outline btn-xs text-black"
-                                onClick={() =>
-                                  router.push(
-                                    `/contractpage/${"item.contractAddresses"}`
-                                  )
-                                }
+                                // onClick={() =>
+                                //   // router.push(
+                                //   //   `/eventPage?contractAddress=${contractAddress}&eventName=${eventName}`
+                                //   // )
+                                // }
                               >
                                 <span className="">Open</span>
                                 <ArrowRight className="h-4 w-4 ml-1" />

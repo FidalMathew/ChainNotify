@@ -168,18 +168,36 @@ const deployedContracts = {
     },
   },
   sepolia: {
-    MyFirstContract: {
+    YourContract2: {
       address:
-        "0x0194390375d53228a1043a3c2adab63a6d5e15e45487776e58e55678a862c137",
+        "0x00a75bf7644610a74580aad577401b5d6cc6d401e189e799e13646c09d518e76",
       abi: [
         {
           type: "impl",
           name: "MyFirstContract",
-          interface_name: "contracts::MyFirstContract::IMyFirstContract",
+          interface_name: "contracts::YourContract2::IMyFirstContract",
+        },
+        {
+          type: "struct",
+          name: "core::byte_array::ByteArray",
+          members: [
+            {
+              name: "data",
+              type: "core::array::Array::<core::bytes_31::bytes31>",
+            },
+            {
+              name: "pending_word",
+              type: "core::felt252",
+            },
+            {
+              name: "pending_word_len",
+              type: "core::integer::u32",
+            },
+          ],
         },
         {
           type: "interface",
-          name: "contracts::MyFirstContract::IMyFirstContract",
+          name: "contracts::YourContract2::IMyFirstContract",
           items: [
             {
               type: "function",
@@ -197,12 +215,104 @@ const deployedContracts = {
               name: "set_value",
               inputs: [
                 {
-                  name: "new_value",
-                  type: "core::integer::u64",
+                  name: "cAddress",
+                  type: "core::byte_array::ByteArray",
+                },
+                {
+                  name: "eventName",
+                  type: "core::byte_array::ByteArray",
+                },
+                {
+                  name: "eventTitle",
+                  type: "core::byte_array::ByteArray",
+                },
+                {
+                  name: "chain",
+                  type: "core::byte_array::ByteArray",
                 },
               ],
               outputs: [],
               state_mutability: "external",
+            },
+            {
+              type: "function",
+              name: "get_Owner",
+              inputs: [
+                {
+                  name: "index",
+                  type: "core::integer::u64",
+                },
+              ],
+              outputs: [
+                {
+                  type: "core::starknet::contract_address::ContractAddress",
+                },
+              ],
+              state_mutability: "view",
+            },
+            {
+              type: "function",
+              name: "get_cAddress",
+              inputs: [
+                {
+                  name: "index",
+                  type: "core::integer::u64",
+                },
+              ],
+              outputs: [
+                {
+                  type: "core::byte_array::ByteArray",
+                },
+              ],
+              state_mutability: "view",
+            },
+            {
+              type: "function",
+              name: "get_eventName",
+              inputs: [
+                {
+                  name: "index",
+                  type: "core::integer::u64",
+                },
+              ],
+              outputs: [
+                {
+                  type: "core::byte_array::ByteArray",
+                },
+              ],
+              state_mutability: "view",
+            },
+            {
+              type: "function",
+              name: "get_eventTitle",
+              inputs: [
+                {
+                  name: "index",
+                  type: "core::integer::u64",
+                },
+              ],
+              outputs: [
+                {
+                  type: "core::byte_array::ByteArray",
+                },
+              ],
+              state_mutability: "view",
+            },
+            {
+              type: "function",
+              name: "get_chain",
+              inputs: [
+                {
+                  name: "index",
+                  type: "core::integer::u64",
+                },
+              ],
+              outputs: [
+                {
+                  type: "core::byte_array::ByteArray",
+                },
+              ],
+              state_mutability: "view",
             },
           ],
         },
@@ -213,32 +323,9 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "contracts::MyFirstContract::MyFirstContract::ValueUpdate",
-          kind: "struct",
-          members: [
-            {
-              name: "prev",
-              type: "core::integer::u64",
-              kind: "data",
-            },
-            {
-              name: "curr",
-              type: "core::integer::u64",
-              kind: "data",
-            },
-          ],
-        },
-        {
-          type: "event",
-          name: "contracts::MyFirstContract::MyFirstContract::Event",
+          name: "contracts::YourContract2::YourContract2::Event",
           kind: "enum",
-          variants: [
-            {
-              name: "ValueUpdate",
-              type: "contracts::MyFirstContract::MyFirstContract::ValueUpdate",
-              kind: "nested",
-            },
-          ],
+          variants: [],
         },
       ],
     },

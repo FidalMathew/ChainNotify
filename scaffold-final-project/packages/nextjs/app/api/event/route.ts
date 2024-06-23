@@ -3,6 +3,21 @@ import cron from 'node-cron';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { Novu } from '@novu/node';
+import mongoose from 'mongoose';
+
+const dbUri = "mongodb://localhost:27017/starkhack";
+
+mongoose.connect(dbUri, {
+    autoIndex: true
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log('Connected to MongoDB');
+});
+
+
 dotenv.config();
 
 const cronJobs: any = {};

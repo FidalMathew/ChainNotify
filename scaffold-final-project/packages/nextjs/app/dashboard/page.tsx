@@ -31,6 +31,7 @@ import {useDeployedContractInfo} from "~~/hooks/scaffold-stark";
 import {BlockNumber} from "starknet";
 import {displayTxResult} from "../debug/_components/contract";
 import {Abi} from "abi-wan-kanabi";
+import axios from "axios";
 
 const contractsData = getAllContracts();
 const contractNames = Object.keys(contractsData) as ContractName[];
@@ -48,6 +49,7 @@ const Dashboard: NextPage = () => {
   const {data: totalCounter} = useScaffoldReadContract({
     contractName: "YourContract2",
     functionName: "get_value",
+    // refetchInterval: 10e3,
   });
 
   const {writeAsync: setValueFunctionName} = useScaffoldWriteContract({
@@ -85,6 +87,14 @@ const Dashboard: NextPage = () => {
           values.chain,
         ],
       });
+
+      const res = await axios.post("http://localhost:3000/api/event", {
+        eventName: values.eventName,
+        eventTitle: values.eventTitle,
+        userAddress: account?.address,
+        contractAddress: values.contractAddress,
+        email: user?.email || "jaydeep.dey03@gmail.com",
+      });
       console.log("Transaction successful:", result);
     } catch (error) {
       console.error("Transaction failed:", error);
@@ -105,6 +115,7 @@ const Dashboard: NextPage = () => {
     args: ["1"],
     enabled: false,
     blockIdentifier: "pending" as BlockNumber,
+    // refetchInterval: 10e3,
   });
 
   console.log(data, "data");
@@ -183,6 +194,15 @@ const Dashboard: NextPage = () => {
             functionsToDisplay[4].fn.outputs
           );
 
+          const res = await axios.get("http://localhost:3000/api/event", {
+            params: {
+              eventName: displayEventName,
+              eventTitle: displayEventTitle,
+              userAddress: displayOwner,
+              contractAddress: displayContractAddresses,
+            },
+          });
+
           if (
             displayOwner != "" &&
             displayContractAddresses != "" &&
@@ -196,6 +216,7 @@ const Dashboard: NextPage = () => {
               eventName: displayEventName,
               eventTitle: displayEventTitle,
               chain: displayChain,
+              toggleState: true,
             });
           }
 
@@ -221,6 +242,14 @@ const Dashboard: NextPage = () => {
   if (allValues.length > 0) {
     console.log(allValues, "allValues");
   }
+
+  const [isChecked, setIsChecked] = useState(false);
+
+  // Step 3: Handle the change event
+  const handleCheckboxChange = (event: any) => {
+    setIsChecked(event.target.checked);
+  };
+
   return (
     <>
       <div className="bg-white h-screen w-full">
@@ -363,6 +392,7 @@ const Dashboard: NextPage = () => {
                     <tr>
                       <th>Event Name</th>
                       <th>Chain</th>
+                      <th className="">Toggle Notification</th>
                       <th className="sr-only"></th>
                     </tr>
                   </thead>
@@ -403,6 +433,60 @@ const Dashboard: NextPage = () => {
                               <span className="font-semibold">
                                 {item.chain}
                               </span>
+                            </div>
+                          </td>
+                          <td className="m-auto">
+                            <div className="form-control">
+                              <label className="label cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  className="toggle"
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      axios
+                                        .post(
+                                          "http://localhost:3000/api/event",
+                                          {
+                                            eventName: item.eventName,
+                                            eventTitle: item.eventTitle,
+                                            userAddress: item.owner,
+                                            contractAddress:
+                                              item.contractAddresses,
+                                            email:
+                                              user?.email ||
+                                              "jaydeep.dey03@gmail.com",
+                                          }
+                                        )
+                                        .then((res) => {
+                                          console.log(res, "res");
+                                        })
+                                        .catch((err) => {
+                                          console.log(err, "err");
+                                        });
+                                    } else {
+                                      axios
+                                        .delete(
+                                          "http://localhost:3000/api/event",
+                                          {
+                                            params: {
+                                              eventName: item.eventName,
+                                              eventTitle: item.eventTitle,
+                                              userAddress: item.owner,
+                                              contractAddress:
+                                                item.contractAddresses,
+                                            },
+                                          }
+                                        )
+                                        .then((res) => {
+                                          console.log(res, "res");
+                                        })
+                                        .catch((err) => {
+                                          console.log(err, "err");
+                                        });
+                                    }
+                                  }}
+                                />
+                              </label>
                             </div>
                           </td>
                           <th>

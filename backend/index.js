@@ -56,7 +56,7 @@ app.post("/setEvent", (req, res) => {
         `Fetching events for ${eventName} on contract ${contractAddress} for user ${userAddress}`
       );
 
-      const url = `https://api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
+      const url = `https://sepolia-api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
       const options = {
         headers: {
           accept: "application/json",
@@ -163,7 +163,7 @@ app.get("/test", async (req, res) => {
       `Fetching events for ${eventName} on contract ${contractAddress} for user ${userAddress}`
     );
 
-    const url = `https://api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
+    const url = `https://sepolia-api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
     const options = {
       headers: {
         accept: "application/json",

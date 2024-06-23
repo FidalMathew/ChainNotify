@@ -7,7 +7,7 @@ const deployedContracts = {
   devnet: {
     YourContract2: {
       address:
-        "0x01d7fe3d031877c0016caa8314d36682351d4ddb8f2f666c3ec18b4a1815ae7d",
+        "0x0257e92803709328639973fc798ca862a89406d7891d25ed771ec24dd3db8c4d",
       abi: [
         {
           type: "impl",
@@ -163,6 +163,82 @@ const deployedContracts = {
           name: "contracts::YourContract2::YourContract2::Event",
           kind: "enum",
           variants: [],
+        },
+      ],
+    },
+  },
+  sepolia: {
+    MyFirstContract: {
+      address:
+        "0x0194390375d53228a1043a3c2adab63a6d5e15e45487776e58e55678a862c137",
+      abi: [
+        {
+          type: "impl",
+          name: "MyFirstContract",
+          interface_name: "contracts::MyFirstContract::IMyFirstContract",
+        },
+        {
+          type: "interface",
+          name: "contracts::MyFirstContract::IMyFirstContract",
+          items: [
+            {
+              type: "function",
+              name: "get_value",
+              inputs: [],
+              outputs: [
+                {
+                  type: "core::integer::u64",
+                },
+              ],
+              state_mutability: "view",
+            },
+            {
+              type: "function",
+              name: "set_value",
+              inputs: [
+                {
+                  name: "new_value",
+                  type: "core::integer::u64",
+                },
+              ],
+              outputs: [],
+              state_mutability: "external",
+            },
+          ],
+        },
+        {
+          type: "constructor",
+          name: "constructor",
+          inputs: [],
+        },
+        {
+          type: "event",
+          name: "contracts::MyFirstContract::MyFirstContract::ValueUpdate",
+          kind: "struct",
+          members: [
+            {
+              name: "prev",
+              type: "core::integer::u64",
+              kind: "data",
+            },
+            {
+              name: "curr",
+              type: "core::integer::u64",
+              kind: "data",
+            },
+          ],
+        },
+        {
+          type: "event",
+          name: "contracts::MyFirstContract::MyFirstContract::Event",
+          kind: "enum",
+          variants: [
+            {
+              name: "ValueUpdate",
+              type: "contracts::MyFirstContract::MyFirstContract::ValueUpdate",
+              kind: "nested",
+            },
+          ],
         },
       ],
     },

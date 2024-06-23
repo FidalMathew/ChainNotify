@@ -55,9 +55,9 @@ export async function POST(req:
 
     const jobKey = generateCronJobKey(userAddress, contractAddress, eventName);
 
-    const job = cron.schedule('*/1 * * * *', async () => {
+    const job = cron.schedule('* * * * *', async () => {
         try {
-            const url = `https://api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
+            const url = `https://sepolia-api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
             const options = {
                 headers: {
                     accept: 'application/json',
@@ -86,20 +86,49 @@ export async function POST(req:
 
             newEvents.forEach(async (event: { eventId: any; }) => {
                 console.log(`New event for ${userAddress}:`, event.eventId);
-                await triggerNotification(subscriberId, email, userAddress, eventName, eventTitle, contractAddress);
+                // await triggerNotification(subscriberId, email, userAddress, eventName, eventTitle, contractAddress);
             });
         } catch (error) {
             console.error(error);
         }
     });
 
-    cronJobs[jobKey] = job as any;
+    cronJobs[jobKey] = {
+        job: job,
+        active: true,
+    }
 
     return NextResponse.json({ jobKey });
 }
 
-export async function DELETE(req: { json: () => PromiseLike<{ userAddress: any; contractAddress: any; eventName: any; }> | { userAddress: any; contractAddress: any; eventName: any; }; }) {
-    const { userAddress, contractAddress, eventName } = await req.json();
+export async function DELETE(req: { url: any; }) {
+    const url = new URL(req.url)
+    const userAddress = url.searchParams.get('userAddress');
+    const contractAddress = url.searchParams.get('contractAddress');
+    const eventName = url.searchParams.get('eventName');
+
+
+    if (!userAddress || !contractAddress || !eventName) {
+        return NextResponse.json({ error: "Missing required parameters." }, { status: 400 });
+    }
+
+    const jobKey = generateCronJobKey(userAddress, contractAddress, eventName);
+    console.log('jobkey cronjobs in delete', cronJobs[jobKey],)
+    if (cronJobs[jobKey]) {
+        cronJobs[jobKey].job.stop();
+        delete cronJobs[jobKey];
+        return NextResponse.json({ message: `Cron job for ${jobKey} has been deleted.` });
+    } else {
+        return NextResponse.json({ error: `No cron job found for ${jobKey}.` }, { status: 404 });
+    }
+}
+
+export async function GET(req: { url: any; }) {
+    const url = new URL(req.url)
+    const userAddress = url.searchParams.get('userAddress');
+    const contractAddress = url.searchParams.get('contractAddress');
+    const eventName = url.searchParams.get('eventName');
+
 
     if (!userAddress || !contractAddress || !eventName) {
         return NextResponse.json({ error: "Missing required parameters." }, { status: 400 });
@@ -108,10 +137,8 @@ export async function DELETE(req: { json: () => PromiseLike<{ userAddress: any; 
     const jobKey = generateCronJobKey(userAddress, contractAddress, eventName);
 
     if (cronJobs[jobKey]) {
-        cronJobs[jobKey].stop();
-        delete cronJobs[jobKey];
-        return NextResponse.json({ message: `Cron job for ${jobKey} has been deleted.` });
+        return NextResponse.json({ active: cronJobs[jobKey].active });
     } else {
-        return NextResponse.json({ error: `No cron job found for ${jobKey}.` }, { status: 404 });
+        return NextResponse.json({ active: false });
     }
 }

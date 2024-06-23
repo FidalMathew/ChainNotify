@@ -9,7 +9,7 @@ export async function GET(req: { json: () => PromiseLike<{ userAddress: any; eve
     const { userAddress, eventName, contractAddress } = await req.json();
 
     try {
-        const url = `https://api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
+        const url = `https://sepolia-api.voyager.online/beta/events?ps=10&p=1&contract=${contractAddress}`;
         const options = {
             headers: {
                 accept: 'application/json',

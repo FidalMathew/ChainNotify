@@ -2894,6 +2894,7 @@ __metadata:
     "@types/react-dom": ^18
     abi-wan-kanabi: ^2.2.2
     autoprefixer: ^10.0.1
+    axios: ^1.7.2
     blo: ^1.1.1
     daisyui: ^4.7.3
     eslint: ^8
@@ -4701,7 +4702,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.2":
+"axios@npm:^1.6.2, axios@npm:^1.7.2":
   version: 1.7.2
   resolution: "axios@npm:1.7.2"
   dependencies:

@@ -34,7 +34,7 @@ mod YourContract2 {
 
     #[constructor]
     fn constructor(ref self: ContractState) {
-        self.count.write(1);
+        self.count.write(0);
     }
 
     #[abi(embed_v0)]

@@ -366,7 +366,9 @@ const Dashboard: NextPage = () => {
               <button
                 className="btn btn-outline gap-1 text-black"
                 onClick={() =>
-                  document.getElementById("my_modal_2")!.showModal()
+                  (document.getElementById(
+                    "my_modal_2"
+                  ) as HTMLDialogElement)!.showModal()
                 }
               >
                 <span className="">Add New Event</span>

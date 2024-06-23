@@ -2,17 +2,52 @@ import { NextResponse } from 'next/server';
 import cron from 'node-cron';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { Novu } from '@novu/node';
 dotenv.config();
 
-const cronJobs = {};
+const cronJobs: any = {};
+const userEventStore: any = {};
+
+const novu = new Novu(process.env.NEXT_PUBLIC_NOVU_API_KEY!);
+
+const triggerNotification = async (
+    subscriberId: string,
+    email: string,
+    userAddress: any,
+    eventName: any,
+    eventTitle: any,
+    contractAddress: any
+) => {
+    try {
+        const res = await novu.trigger('chainnotify', {
+            to: {
+                subscriberId: subscriberId,
+                email: email,
+            },
+            payload: {
+                eventName: eventName,
+                eventTitle: eventTitle,
+                userAddresss: userAddress,
+                contractAddress: contractAddress,
+            },
+        });
+
+        console.log(res);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 
 const generateCronJobKey = (userAddress: any, contractAddress: any, eventName: any) => {
     return `${userAddress}-${contractAddress}-${eventName}`;
 };
 
-export async function POST(req: { json: () => PromiseLike<{ userAddress: any; contractAddress: any; eventName: any; }> | { userAddress: any; contractAddress: any; eventName: any; }; }) {
-    const { userAddress, contractAddress, eventName } = await req.json();
+export async function POST(req:
+    { json: () => PromiseLike<{ userAddress: any; contractAddress: any; eventName: any; eventTitle: any; email: any; }> | { userAddress: any; contractAddress: any; eventName: any; eventTitle: any; email: any; }; }
+) {
+    const { userAddress, contractAddress, eventName, eventTitle, email } = await req.json();
 
     if (!userAddress || !contractAddress || !eventName) {
         return NextResponse.json({ error: "Missing required parameters." }, { status: 400 });
@@ -47,16 +82,18 @@ export async function POST(req: { json: () => PromiseLike<{ userAddress: any; co
                 storedEventIds.add(event.eventId);
             });
 
-            newEvents.forEach((event: { eventId: any; }) => {
+            const subscriberId = Math.random().toString(36).substring(7);
+
+            newEvents.forEach(async (event: { eventId: any; }) => {
                 console.log(`New event for ${userAddress}:`, event.eventId);
-                // triggerNotification(userAddress, event);
+                await triggerNotification(subscriberId, email, userAddress, eventName, eventTitle, contractAddress);
             });
         } catch (error) {
             console.error(error);
         }
     });
 
-    cronJobs[jobKey] = job as String;
+    cronJobs[jobKey] = job as any;
 
     return NextResponse.json({ jobKey });
 }

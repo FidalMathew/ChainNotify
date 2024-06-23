@@ -3,7 +3,7 @@ import { Novu } from '@novu/node';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const novu = new Novu(process.env.NEXT_PUBLIC_NOVU_API_KEY);
+const novu = new Novu(process.env.NEXT_PUBLIC_NOVU_API_KEY!);
 
 const triggerNotification = async (
     subscriberId: string,
@@ -35,8 +35,8 @@ const triggerNotification = async (
 
 export async function POST(req: { json: () => PromiseLike<{ userAddress: any; eventTitle: any; eventName: any; contractAddress: any; }> | { userAddress: any; eventTitle: any; eventName: any; contractAddress: any; }; }) {
     const { userAddress, eventTitle, eventName, contractAddress } = await req.json();
-    const subscriberId = "dasdas";
-    const email = "fidal15perfect@gmail.com";
+    const subscriberId = "deydey";
+    const email = "jaydeep.dey03@gmail.com";
 
     try {
         await triggerNotification(subscriberId, email, userAddress, eventName, eventTitle, contractAddress);

@@ -223,7 +223,7 @@ const Dashboard: NextPage = () => {
   }
   return (
     <>
-      <div className="bg-white h-screen w-full text-black">
+      <div className="bg-white h-screen w-full">
         <dialog id="my_modal_2" className="modal">
           <div className="modal-box w-11/12 max-w-5xl h-fit px-10 py-10 pt-8">
             <Formik
@@ -420,6 +420,62 @@ const Dashboard: NextPage = () => {
                           </th>
                         </tr>
                       ))}
+
+                    {allValues.length === 0 &&
+                      Number(totalCounter) > 0 &&
+                      Array.from({length: Number(totalCounter)}).map(
+                        (item, index) => (
+                          <tr key={index}>
+                            <td className="h-24">
+                              <div className="flex items-center gap-3">
+                                {/* <div className="avatar">
+                              <div className="mask mask-squircle w-12 h-12">
+                                <img
+                                  src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png"
+                                  alt="Avatar Tailwind CSS Component"
+                                />
+                              </div>
+                            </div> */}
+                                <div className="flex justify-start items-start gap-2 w-full flex-col">
+                                  {/* <div className="skeleton h-4 w-1/3 rounded" />
+                              <div className="skeleton h-4 w-full rounded" /> */}
+                                  <div className="font-bold">
+                                    <div className="skeleton h-4 w-28" />
+                                  </div>
+                                  <div className="text-sm opacity-50">
+                                    <div className="skeleton h-4 w-44"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="flex items-center gap-2 border rounded-full w-fit p-1 px-2">
+                                <img
+                                  src="https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png"
+                                  alt="eth"
+                                  className="h-5 w-5"
+                                />
+                                <span className="font-semibold">
+                                  <div className="skeleton h-4 w-24"></div>
+                                </span>
+                              </div>
+                            </td>
+                            <th>
+                              <button
+                                className="btn btn-outline btn-xs text-black"
+                                onClick={() =>
+                                  router.push(
+                                    `/contractpage/${"item.contractAddresses"}`
+                                  )
+                                }
+                              >
+                                <span className="">Open</span>
+                                <ArrowRight className="h-4 w-4 ml-1" />
+                              </button>
+                            </th>
+                          </tr>
+                        )
+                      )}
                   </tbody>
                 </table>
               </div>

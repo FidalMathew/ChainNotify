@@ -60,7 +60,7 @@ app.post("/setEvent", (req, res) => {
       const options = {
         headers: {
           accept: "application/json",
-          "x-api-key": process.env.NEXT_VOYAGER_API_KEY,
+          "x-api-key": process.env.NEXT_PUBLIC_VOYAGER_API_KEY,
         },
       };
 
@@ -167,7 +167,7 @@ app.get("/test", async (req, res) => {
     const options = {
       headers: {
         accept: "application/json",
-        "x-api-key": process.env.NEXT_VOYAGER_API_KEY,
+        "x-api-key": process.env.NEXT_PUBLIC_VOYAGER_API_KEY,
       },
     };
 

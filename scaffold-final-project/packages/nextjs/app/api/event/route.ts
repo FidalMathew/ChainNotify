@@ -26,7 +26,7 @@ export async function POST(req: { json: () => PromiseLike<{ userAddress: any; co
             const options = {
                 headers: {
                     accept: 'application/json',
-                    'x-api-key': process.env.NEXT_VOYAGER_API_KEY,
+                    'x-api-key': process.env.NEXT_PUBLIC_VOYAGER_API_KEY,
                 },
             };
 

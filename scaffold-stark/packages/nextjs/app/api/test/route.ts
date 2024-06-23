@@ -13,7 +13,7 @@ export async function GET(req: { json: () => PromiseLike<{ userAddress: any; eve
         const options = {
             headers: {
                 accept: 'application/json',
-                'x-api-key': process.env.NEXT_VOYAGER_API_KEY,
+                'x-api-key': process.env.NEXT_PUBLIC_VOYAGER_API_KEY,
             },
         };
 

@@ -38,6 +38,7 @@ const contractNames = Object.keys(contractsData) as ContractName[];
 
 const Dashboard: NextPage = () => {
   const {account} = useAccount();
+  const router = useRouter();
   const {primaryWallet, user} = useDynamicContext();
 
   const {data: yourContract2} = useScaffoldContract({
@@ -47,6 +48,12 @@ const Dashboard: NextPage = () => {
   const {data: totalCounter} = useScaffoldReadContract({
     contractName: "YourContract2",
     functionName: "get_value",
+  });
+
+  const {writeAsync: setValueFunctionName} = useScaffoldWriteContract({
+    contractName: "YourContract2",
+    functionName: "set_value",
+    args: ["fidal", "fidal", "fidal", "fidal"],
   });
 
   console.log(Number(totalCounter), "totalCounter");
@@ -68,21 +75,21 @@ const Dashboard: NextPage = () => {
   //   }
   // }, [yourContract2]);
 
-  // const handleSetValue = async (values: FormikValues) => {
-  //   try {
-  //     //   const result = await setValueFunctionName({
-  //     //     args: [
-  //     //       values.contractAddress,
-  //     //       values.eventName,
-  //     //       values.eventTitle,
-  //     //       values.chain,
-  //     //     ],
-  //     //   });
-  //     //   console.log("Transaction successful:", result);
-  //   } catch (error) {
-  //     console.error("Transaction failed:", error);
-  //   }
-  // };
+  const handleSetValue = async (values: FormikValues) => {
+    try {
+      const result = await setValueFunctionName({
+        args: [
+          values.contractAddress,
+          values.eventName,
+          values.eventTitle,
+          values.chain,
+        ],
+      });
+      console.log("Transaction successful:", result);
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    }
+  };
 
   //   useEffect(() => {
   //     // route to / if user is not present or connectedAddress is not present
@@ -139,61 +146,70 @@ const Dashboard: NextPage = () => {
   useEffect(() => {
     let values: any[] = [];
     async function getAllValues() {
-      for (let i = 1; i < functionsToDisplay.length - 1; i++) {
-        const owner = await yourContract2?.get_Owner(BigInt(i));
-        const contractAddresses = await yourContract2?.get_cAddress(BigInt(i));
-        const eventName = await yourContract2?.get_eventName(BigInt(i));
-        const eventTitle = await yourContract2?.get_eventTitle(BigInt(i));
-        const chain = await yourContract2?.get_chain(BigInt(i));
+      try {
+        for (let i = 1; i < Number(totalCounter); i++) {
+          const owner = await yourContract2?.get_Owner(BigInt(i));
+          const contractAddresses = await yourContract2?.get_cAddress(
+            BigInt(i)
+          );
+          const eventName = await yourContract2?.get_eventName(BigInt(i));
+          const eventTitle = await yourContract2?.get_eventTitle(BigInt(i));
+          const chain = await yourContract2?.get_chain(BigInt(i));
 
-        const displayOwner = displayTxResult(
-          owner,
-          false,
-          functionsToDisplay[0].fn.outputs
-        );
-        const displayContractAddresses = displayTxResult(
-          contractAddresses,
-          false,
-          functionsToDisplay[1].fn.outputs
-        );
-        const displayEventName = displayTxResult(
-          eventName,
-          false,
-          functionsToDisplay[2].fn.outputs
-        );
-        const displayEventTitle = displayTxResult(
-          eventTitle,
-          false,
-          functionsToDisplay[3].fn.outputs
-        );
+          const displayOwner = displayTxResult(
+            owner,
+            false,
+            functionsToDisplay[0].fn.outputs
+          );
+          const displayContractAddresses = displayTxResult(
+            contractAddresses,
+            false,
+            functionsToDisplay[1].fn.outputs
+          );
+          const displayEventName = displayTxResult(
+            eventName,
+            false,
+            functionsToDisplay[2].fn.outputs
+          );
+          const displayEventTitle = displayTxResult(
+            eventTitle,
+            false,
+            functionsToDisplay[3].fn.outputs
+          );
 
-        const displayChain = displayTxResult(
-          chain,
-          false,
-          functionsToDisplay[4].fn.outputs
-        );
+          const displayChain = displayTxResult(
+            chain,
+            false,
+            functionsToDisplay[4].fn.outputs
+          );
 
-        if (
-          displayOwner != "" &&
-          displayContractAddresses != "" &&
-          displayEventName != "" &&
-          displayEventTitle != "" &&
-          displayChain != ""
-        ) {
-          addUniqueObjectToArray(values, {
-            owner: displayOwner,
-            contractAddresses: displayContractAddresses,
-            eventName: displayEventName,
-            eventTitle: displayEventTitle,
-            chain: displayChain,
-          });
+          if (
+            displayOwner != "" &&
+            displayContractAddresses != "" &&
+            displayEventName != "" &&
+            displayEventTitle != "" &&
+            displayChain != ""
+          ) {
+            addUniqueObjectToArray(values, {
+              owner: displayOwner,
+              contractAddresses: displayContractAddresses,
+              eventName: displayEventName,
+              eventTitle: displayEventTitle,
+              chain: displayChain,
+            });
+          }
+
+          console.log(values, "fucku");
         }
 
-        console.log(values, "fucku");
-      }
-
-      if (Number(totalCounter) && allValues.length < Number(totalCounter) - 1) {
-        setAllValues(values);
+        if (
+          Number(totalCounter) &&
+          allValues.length < Number(totalCounter) - 1
+        ) {
+          setAllValues(values);
+        }
+      } catch (err) {
+        console.log(err, "err");
       }
     }
 
@@ -202,10 +218,12 @@ const Dashboard: NextPage = () => {
     }
   }, [functionsToDisplay, yourContract2]);
 
-  console.log(allValues, "allValues");
+  if (allValues.length > 0) {
+    console.log(allValues, "allValues");
+  }
   return (
     <>
-      <div className="bg-white h-screen w-full">
+      <div className="bg-white h-screen w-full text-black">
         <dialog id="my_modal_2" className="modal">
           <div className="modal-box w-11/12 max-w-5xl h-fit px-10 py-10 pt-8">
             <Formik
@@ -215,8 +233,8 @@ const Dashboard: NextPage = () => {
                 contractAddress: "",
                 chain: "Starknet",
               }}
-              // onSubmit={(values, _) => handleSetValue(values as FormikValues)}
-              onSubmit={(values, _) => {}}
+              onSubmit={(values, _) => handleSetValue(values as FormikValues)}
+              // onSubmit={(values, _) => {}}
             >
               {(formik) => (
                 <Form>
@@ -289,7 +307,7 @@ const Dashboard: NextPage = () => {
           </form>
         </dialog>
         <div className="flex h-full w-full">
-          <div className="w-[350px] border-r border-slate-200 bg-white h-full flex flex-col p-5 gap-5">
+          <div className="w-[350px] border-r border-slate-200 bg-white text-black h-full flex flex-col p-5 gap-5">
             <div className="mb-6">
               <p className="font-bold tracking-wide text-3xl pl-3 pt-2 font-Poppins">
                 ChainNotify
@@ -313,13 +331,10 @@ const Dashboard: NextPage = () => {
           <div className="w-full">
             <div className="border-b border-slate-200 h-[70px] flex items-center justify-between px-7">
               <button
-                className="btn btn-outline gap-1"
-                // onClick={
-                //   //   () => {
-                //   //     testing();
-                //   //   }
-                //   //   document.getElementById("my_modal_2")!.showModal()
-                // }
+                className="btn btn-outline gap-1 text-black"
+                onClick={() =>
+                  document.getElementById("my_modal_2")!.showModal()
+                }
               >
                 <span className="">Add New Event</span>
               </button>
@@ -344,21 +359,21 @@ const Dashboard: NextPage = () => {
               >
                 <table className="table">
                   {/* head */}
-                  <thead>
+                  <thead className="text-black">
                     <tr>
                       <th>Event Name</th>
                       <th>Chain</th>
-                      <th>Created At</th>
                       <th className="sr-only"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {/* row 1 */}
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((item, index) => (
-                      <tr key={index}>
-                        <td className="h-24">
-                          <div className="flex items-center gap-3">
-                            {/* <div className="avatar">
+                    {allValues.length > 0 &&
+                      allValues.map((item, index) => (
+                        <tr key={index}>
+                          <td className="h-24">
+                            <div className="flex items-center gap-3">
+                              {/* <div className="avatar">
                               <div className="mask mask-squircle w-12 h-12">
                                 <img
                                   src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png"
@@ -366,53 +381,45 @@ const Dashboard: NextPage = () => {
                                 />
                               </div>
                             </div> */}
-                            <div>
-                              <div className="font-bold">Transfer Event</div>
-                              <div className="text-sm opacity-50">
-                                0x87cd12be2cf76239294D97Ea4978Ee9cC19Fd283
+                              <div className="flex justify-start items-start gap-2 w-full flex-col">
+                                {/* <div className="skeleton h-4 w-1/3 rounded" />
+                              <div className="skeleton h-4 w-full rounded" /> */}
+                                <div className="font-bold">
+                                  {item.eventTitle}
+                                </div>
+                                <div className="text-sm opacity-50">
+                                  {item.contractAddresses}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="flex items-center gap-2 border rounded-full w-fit p-1 px-2">
-                            {index % 2 === 0 ? (
-                              <>
-                                <img
-                                  src="https://cdn-images-1.medium.com/max/1200/1*sR6r6LFD2GQ6RT0mLOAuZQ.png"
-                                  alt="starknet"
-                                  className="h-5 w-5"
-                                />
-                                <span className="font-semibold">
-                                  Starknet Sepolia
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <img
-                                  src="https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png"
-                                  alt="eth"
-                                  className="h-5 w-5"
-                                />
-                                <span className="font-semibold">
-                                  Ethereum Sepolia
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                        <td>2023-07-12 10:42 AM</td>
-                        <th>
-                          <button
-                            className="btn btn-outline btn-xs"
-                            onClick={() => router.push(`/contractpage/efeefef`)}
-                          >
-                            <span className="">Open</span>
-                            <ArrowRight className="h-4 w-4 ml-1" />
-                          </button>
-                        </th>
-                      </tr>
-                    ))}
+                          </td>
+                          <td>
+                            <div className="flex items-center gap-2 border rounded-full w-fit p-1 px-2">
+                              <img
+                                src="https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png"
+                                alt="eth"
+                                className="h-5 w-5"
+                              />
+                              <span className="font-semibold">
+                                {item.chain}
+                              </span>
+                            </div>
+                          </td>
+                          <th>
+                            <button
+                              className="btn btn-outline btn-xs text-black"
+                              onClick={() =>
+                                router.push(
+                                  `/contractpage/${item.contractAddresses}`
+                                )
+                              }
+                            >
+                              <span className="">Open</span>
+                              <ArrowRight className="h-4 w-4 ml-1" />
+                            </button>
+                          </th>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
